@@ -4,202 +4,211 @@
 <head>
     <meta charset="UTF-8">
     <meta-name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Eskimo</title>
+        <title>Login - Eskimo</title>
 
-<style>
-    body {
-        margin: 0;
-        padding: 0;
-        font-family: "Poppins", sans-serif;
-        background: radial-gradient(circle at top right, #ffecec, #ffffff);
-        background-attachment: fixed;
-    }
+        <style>
+            body {
+                margin: 0;
+                padding: 0;
+                font-family: "Poppins", sans-serif;
+                background: radial-gradient(circle at top right, #ffecec, #ffffff);
+                background-attachment: fixed;
+            }
 
-    /* Container */
-    section {
-        max-width: 480px;
-        margin: 80px auto;
-        background: #fff;
-        padding: 50px;
-        border-radius: 28px;
-        box-shadow: 0 6px 20px #00000025;
-        position: relative;
-        overflow: hidden;
-        animation: fadeIn 0.6s ease-out;
-        transition: 0.2s ease;
-    }
+            /* Container */
+            section {
+                max-width: 480px;
+                margin: 80px auto;
+                background: #fff;
+                padding: 50px;
+                border-radius: 28px;
+                box-shadow: 0 6px 20px #00000025;
+                position: relative;
+                overflow: hidden;
+                animation: fadeIn 0.6s ease-out;
+                transition: 0.2s ease;
+            }
 
-    section:hover {
-        transform: translateY(-3px);
-    }
+            section:hover {
+                transform: translateY(-3px);
+            }
 
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
 
-    /* Bolhas decorativas estilo Eskimo */
-    section::before,
-    section::after {
-        content: "";
-        position: absolute;
-        background: #ffd5d5;
-        width: 130px;
-        height: 130px;
-        border-radius: 50%;
-        z-index: -1;
-        opacity: 0.8;
-    }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
 
-    section::before {
-        top: -40px;
-        right: -30px;
-    }
+            /* Bolhas decorativas estilo Eskimo */
+            section::before,
+            section::after {
+                content: "";
+                position: absolute;
+                background: #ffd5d5;
+                width: 130px;
+                height: 130px;
+                border-radius: 50%;
+                z-index: -1;
+                opacity: 0.8;
+            }
 
-    section::after {
-        bottom: -40px;
-        left: -30px;
-    }
+            section::before {
+                top: -40px;
+                right: -30px;
+            }
 
-    /* Logo */
-    .logo {
-        width: 150px;
-        display: block;
-        margin: 0 auto 15px;
-    }
+            section::after {
+                bottom: -40px;
+                left: -30px;
+            }
 
-    /* Título */
-    h2 {
-        color: #0A0A23;
-        font-size: 1.9rem;
-        font-weight: 800;
-        text-align: center;
-        margin: 10px 0;
-    }
+            /* Logo */
+            .logo {
+                width: 150px;
+                display: block;
+                margin: 0 auto 15px;
+            }
 
-    /* Subtexto */
-    .sub {
-        text-align: center;
-        font-size: 0.92rem;
-        color: #555;
-        margin-bottom: 25px;
-    }
+            /* Título */
+            h2 {
+                color: #0A0A23;
+                font-size: 1.9rem;
+                font-weight: 800;
+                text-align: center;
+                margin: 10px 0;
+            }
 
-    /* Labels */
-    label {
-        display: block;
-        text-align: left;
-        font-weight: 600;
-        margin-top: 18px;
-        color: #333;
-        font-size: .95rem;
-    }
+            /* Subtexto */
+            .sub {
+                text-align: center;
+                font-size: 0.92rem;
+                color: #555;
+                margin-bottom: 25px;
+            }
 
-    /* Inputs */
-    input, select {
-        width: 100%;
-        padding: 14px;
-        border-radius: 12px;
-        border: 2px solid #e0e0e0;
-        font-size: 1rem;
-        background: #fafafa;
-        transition: .25s ease;
-    }
+            /* Labels */
+            label {
+                display: block;
+                text-align: left;
+                font-weight: 600;
+                margin-top: 18px;
+                color: #333;
+                font-size: .95rem;
+            }
 
-    input:focus, select:focus {
-        border-color: #ff3b3f;
-        box-shadow: 0 0 8px #ffb1b3;
-        background: white;
-    }
+            /* Inputs */
+            input,
+            select {
+                width: 100%;
+                padding: 14px;
+                border-radius: 12px;
+                border: 2px solid #e0e0e0;
+                font-size: 1rem;
+                background: #fafafa;
+                transition: .25s ease;
+            }
 
-    /* Botão */
-    button {
-        margin-top: 28px;
-        width: 100%;
-        padding: 14px;
-        background: #ff3b3f;
-        color: white;
-        font-size: 1.2rem;
-        font-weight: 700;
-        border: none;
-        border-radius: 14px;
-        cursor: pointer;
-        transition: 0.25s;
-        box-shadow: 0 4px 12px #ff3b3f55;
-        letter-spacing: .5px;
-    }
+            input:focus,
+            select:focus {
+                border-color: #ff3b3f;
+                box-shadow: 0 0 8px #ffb1b3;
+                background: white;
+            }
 
-    button:hover {
-        background: #e22f32;
-        transform: translateY(-3px);
-    }
+            /* Botão */
+            button {
+                margin-top: 28px;
+                width: 100%;
+                padding: 14px;
+                background: #ff3b3f;
+                color: white;
+                font-size: 1.2rem;
+                font-weight: 700;
+                border: none;
+                border-radius: 14px;
+                cursor: pointer;
+                transition: 0.25s;
+                box-shadow: 0 4px 12px #ff3b3f55;
+                letter-spacing: .5px;
+            }
 
-    /* Botão voltar */
-    .voltar {
-        display: inline-block;
-        margin-bottom: 20px;
-        color: #0A0A23;
-        font-weight: 600;
-        text-decoration: none;
-        font-size: 0.9rem;
-        transition: 0.2s ease;
-    }
+            button:hover {
+                background: #e22f32;
+                transform: translateY(-3px);
+            }
 
-    .voltar:hover {
-        color: #ff3b3f;
-    }
+            /* Botão voltar */
+            .voltar {
+                display: inline-block;
+                margin-bottom: 20px;
+                color: #0A0A23;
+                font-weight: 600;
+                text-decoration: none;
+                font-size: 0.9rem;
+                transition: 0.2s ease;
+            }
 
-    /* Rodapé pequeno */
-    .footer {
-        text-align: center;
-        font-size: 0.85rem;
-        color: #777;
-        margin-top: 15px;
-    }
+            .voltar:hover {
+                color: #ff3b3f;
+            }
 
-    .footer a {
-        color: #ff3b3f;
-        text-decoration: none;
-        font-weight: 600;
-    }
+            /* Rodapé pequeno */
+            .footer {
+                text-align: center;
+                font-size: 0.85rem;
+                color: #777;
+                margin-top: 15px;
+            }
 
-</style>
+            .footer a {
+                color: #ff3b3f;
+                text-decoration: none;
+                font-weight: 600;
+            }
+        </style>
 </head>
 
 <body>
 
-<section>
+    <section>
 
-    <a href="index.html" class="voltar">← Voltar ao site</a>
+        <a href="index.html" class="voltar">← Voltar ao site</a>
 
-    <img class="logo" src="/fabrica_de_picoles/assets/image-1.png.webp">
+        <img class="logo" src="/fabrica_de_picoles/assets/image-1.png.webp">
 
-    <h2>Faça seu login</h2>
-    <p class="sub">Entre para acessar sua área exclusiva.</p>
+        <h2>Faça seu login</h2>
+        <p class="sub">Entre para acessar sua área exclusiva.</p>
 
-    <form action="autenticacao.php" method="post">
-        
-        <label for="nome">Nome completo:</label>
-        <input type="text" name="nome" placeholder="Ex: Ana Cristina Souza" required>
+        <form action="autenticacao.php" method="post">
 
-        <label for="email">E-mail:</label>
-        <input type="email" name="email" placeholder="exemplo@dominio.com" required>
+            <label for="email">E-mail:</label>
+            <input type="email" name="email" placeholder="exemplo@dominio.com" required>
 
-        <label for="cargo">Selecione seu perfil:</label>
-        <select name="colaborador" required>
-            <option value="" disabled selected hidden>Escolha uma opção</option>
-            <option value="venda">Vendedor</option>
-            <option value="logistica">Logística</option>
-            <option value="usuario_producao">Cliente</option>
-        </select>
+            <label for="senha">Senha:</label>
+            <input type="password" name="senha" placeholder="Insira aqui sua senha!" required>
 
-        <button type="submit">Entrar</button>
-    </form>
+            <label for="cargo">Selecione seu perfil:</label>
+            <select name="colaborador" required>
+                <option value="" disabled selected hidden>Escolha uma opção</option>
+                <option value="venda">Vendedor</option>
+                <option value="logistica">Logística</option>
+                <option value="usuario_producao">Cliente</option>
+            </select>
 
-    <p class="footer">Não tem conta? <a href="criar_conta.html">Fazer cadastro</a></p>
-     <p class="footer">esqueceu a senha ? <a href="criar_conta.html">Trocar de senha</a></p>
+            <button type="submit">Entrar</button>
+        </form>
 
-</section>
+        <p class="footer">Não tem conta? <a href="criar_conta.html">Fazer cadastro</a></p>
+        <p class="footer">esqueceu a senha ? <a href="criar_conta.html">Trocar de senha</a></p>
+
+    </section>
 
 </body>
+
 </html>
