@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loja de Picolés</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Poppins, sans-serif;
+            background: #0a0a0a;
+            color: #fff;
+        }
+        header {
+            background: #b30000;
+            padding: 20px;
+            text-align: center;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .produtos {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+        .card {
+            background: #111;
+            border: 2px solid #900;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        .card img {
+            width: 100%;
+            border-radius: 10px;
+        }
+        button {
+            margin-top: 10px;
+            padding: 10px 15px;
+            background: #b30000;
+            border: none;
+            color: #fff;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        button:hover { background: #d00000; }
+
+        #carrinho {
+            padding: 20px;
+            background: #111;
+            border-top: 3px solid #900;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #900;
+            padding: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<header>🍧 Loja Oficial de Picolés</header>
+
+<section class="produtos" id="listaProdutos"></section>
+
+<section id="carrinho">
+    <h2>🛒 Carrinho</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Produto</th>
+                <th>Qtd</th>
+                <th>Preço</th>
+                <th>Remover</th>
+            </tr>
+        </thead>
+        <tbody id="tabelaCarrinho"></tbody>
+    </table>
+    <h3>Total: <span id="totalCompra">R$ 0,00</span></h3>
+    <button onclick="finalizarCompra()">Finalizar Compra</button>
+</section>
+
+<script>
+const produtos = [
+    { id: 1, nome: "Picolé de Morango", preco: 4.00, img: "https://i.imgur.com/OuQZ7G7.png" },
+    { id: 2, nome: "Picolé de Chocolate", preco: 5.00, img: "https://i.imgur.com/OuQZ7G7.png" },
+    { id: 3, nome: "Picolé de Limão", preco: 3.50, img: "https://i.imgur.com/OuQZ7G7.png" }
+];
+
+let carrinho = [];
+
+function carregarProdutos() {
+    const lista = document.getElementById('listaProdutos');
+    lista.innerHTML = '';
+    produtos.forEach(p => {
+        lista.innerHTML += `
+            <div class='card'>
+                <img src="${p.img}" alt="${p.nome}">
+                <h3>${p.nome}</h3>
+                <p>R$ ${p.preco.toFixed(2)}</p>
+                <button onclick="adicionarCarrinho(${p.id})">Adicionar</button>
+            </div>`;
+    });
+}
+
+function adicionarCarrinho(id) {
+    const item = carrinho.find(i => i.id === id);
+    if (item) {
+        item.qtd++;
+    } else {
+        const produto = produtos.find(p => p.id === id);
+        carrinho.push({ ...produto, qtd: 1 });
+    }
+    atualizarCarrinho();
+}
+
+function removerItem(id) {
+    carrinho = carrinho.filter(i => i.id !== id);
+    atualizarCarrinho();
+}
+
+function atualizarCarrinho() {
+    const tabela = document.getElementById('tabelaCarrinho');
+    const total = document.getElementById('totalCompra');
+
+    let soma = 0;
+    tabela.innerHTML = '';
+
+    carrinho.forEach(item => {
+        soma += item.preco * item.qtd;
+        tabela.innerHTML += `
+            <tr>
+                <td>${item.nome}</td>
+                <td>${item.qtd}</td>
+                <td>R$ ${(item.preco * item.qtd).toFixed(2)}</td>
+                <td><button onclick="removerItem(${item.id})">Remover</button></td>
+            </tr>`;
+    });
+
+    total.innerText = `R$ ${soma.toFixed(2)}`;
+}
+
+function finalizarCompra() {
+    if (carrinho.length === 0) {
+        alert("Seu carrinho está vazio!");
+        return;
+    }
+    alert("Compra finalizada com sucesso! Obrigado! 🍧");
+    carrinho = [];
+    atualizarCarrinho();
+}
+
+carregarProdutos();
+</script>
+
+</body>
+</html>

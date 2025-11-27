@@ -1,0 +1,475 @@
+<!doctype html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dashboard Vendas & Notas - Picolés</title>
+  <style>
+    :root {
+      --bg: #070707;
+      --card: #0f0f0f;
+      --accent: #d32f2f;
+      --muted: #b3b3b3
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, system-ui, Segoe UI, Roboto, Arial;
+      color: #fff;
+      background: linear-gradient(180deg, #040404, #0b0b0b);
+      padding: 20px
+    }
+
+    .wrap {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 20px
+    }
+
+    .panel {
+      background: linear-gradient(180deg, rgba(211, 47, 47, 0.05), transparent);
+      padding: 18px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.03)
+    }
+
+    .logo {
+      width: 44px;
+      height: 44;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent), #700000);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700
+    }
+
+    .nav button {
+      display: block;
+      width: 100%;
+      text-align: left;
+      padding: 10px;
+      border-radius: 8px;
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      margin-bottom: 6px;
+      cursor: pointer
+    }
+
+    .nav button.active {
+      background: linear-gradient(90deg, rgba(211, 47, 47, 0.12), rgba(0, 0, 0, 0.2));
+      color: #fff
+    }
+
+    main {
+      padding: 18px;
+      border-radius: 12px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent);
+      border: 1px solid rgba(255, 255, 255, 0.03)
+    }
+
+    h2 {
+      margin: 0 0 6px 0
+    }
+
+    .stats {
+      display: flex;
+      gap: 12px;
+      margin: 12px 0
+    }
+
+    .card {
+      flex: 1;
+      padding: 12px;
+      border-radius: 10px;
+      background: var(--card);
+      border: 1px solid rgba(255, 255, 255, 0.02)
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px
+    }
+
+    th,
+    td {
+      padding: 8px;
+      text-align: left;
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.03);
+      color: var(--muted)
+    }
+
+    .btn {
+      padding: 8px 12px;
+      border-radius: 8px;
+      background: linear-gradient(90deg, var(--accent), #8b0000);
+      border: none;
+      color: #fff;
+      cursor: pointer
+    }
+
+    .btn.ghost {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.04)
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 8px
+    }
+
+    select option{
+      display: flex;
+    }
+
+    input,
+    select,
+    textarea {
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      background: transparent;
+      color: #fff
+    }
+
+    .row {
+      display: flex;
+      gap: 12px
+    }
+
+    .col {
+      flex: 1
+    }
+
+    .muted {
+      color: var(--muted)
+    }
+
+    @media(max-width:900px) {
+      .wrap {
+        grid-template-columns: 1fr
+      }
+
+      .panel {
+        order: 2
+      }
+    }
+
+    /* invoice print style */
+    #invoicePreview {
+      background: #fff;
+      color: #000;
+      padding: 16px;
+      border-radius: 6px
+    }
+
+    @media print {
+      body *:not(#invoicePreview):not(#invoicePreview *) {
+        visibility: hidden
+      }
+
+      #invoicePreview {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 100%
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <aside class="panel">
+      <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px">
+        <div>
+          <div style="font-weight:700;">Vendas Picolés</div>
+        </div>
+      </div>
+
+      <div class="muted" style="font-size:13px;margin-bottom:10px">Pesquisar</div>
+      <input id="search" placeholder="cliente, produto, nota"
+        style="width:100%;margin-bottom:10px;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:#fff" />
+
+      <nav class="nav">
+        <button class="active" data-view="vendas">Vendas</button>
+        <button data-view="clientes">Clientes</button>
+        <button data-view="produtos">Produtos</button>
+        <button data-view="notas">Notas Fiscais</button>
+        <button data-view="relatorios">Relatórios</button>
+      </nav>
+
+    </aside>
+
+    <main>
+      <header style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <h2>Painel de Vendas</h2>
+          <div class="muted">Gerencie pedidos, clientes e emita notas</div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:center">
+          <div class="muted">Usuário: Comercial</div>
+        </div>
+      </header>
+
+      <div class="stats">
+        <div class="card">
+          <div class="muted">Total Vendas (Mês)</div>
+          <div style="font-size:20px;font-weight:700" id="totalSales">R$ 0,00</div>
+        </div>
+        <div class="card">
+          <div class="muted">Notas Emitidas</div>
+          <div style="font-size:20px;font-weight:700" id="nfCount">0</div>
+        </div>
+        <div class="card">
+          <div class="muted">Clientes</div>
+          <div style="font-size:20px;font-weight:700" id="clientsCount">0</div>
+        </div>
+      </div>
+
+      <section class="card" id="vendas">
+        <h3>Registrar Venda</h3>
+        <div class="row">
+          <div class="col">
+            <form id="saleForm">
+              <input name="cliente" id="saleCliente" placeholder="Nome do cliente" required />
+              <select id="saleProduto" name="produto">
+                <option style="color: #000;" value="">picole de Uva</option>
+                <option value="">picole de Melancia</option>
+                <option value="">picole de Melão</option>
+                <option value="">picole de Menta</option>
+                <option value="">picole de Chocolate</option>
+                <option value="">picole de uva</option>
+                <option value="">picole de uva</option>
+              </select>
+              <div style="display:flex;gap:8px">
+                <input name="qt" type="number" placeholder="Quantidade" value="10" required />
+                <input name="preco" type="number" step="0.01" placeholder="Preço unitário R$" value="1.50" required />
+              </div>
+              <textarea name="obs" placeholder="Observações (opcional)"></textarea>
+              <div style="display:flex;gap:8px;align-items:center">
+                <label class="muted">Emitir nota fiscal?</label>
+                <select name="emitir" id="emitirNF">
+                  <option value="nao">Não</option>
+                  <option value="sim">Sim</option>
+                </select>
+                <button class="btn" type="submit">Registrar Venda</button>
+              </div>
+            </form>
+          </div>
+          <div style="width:340px">
+            <h4>Vendas recentes</h4>
+            <table>
+              <thead>
+                <tr>
+                  <th>Cliente</th>
+                  <th>Itens</th>
+                  <th>Valor</th>
+                </tr>
+              </thead>
+              <tbody id="salesTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" id="clientes" style="display:none">
+        <h3>Clientes</h3>
+        <div class="row">
+          <div class="col">
+            <table>
+              <thead>
+                <tr>
+                  <th>Nome</th>
+                  <th>CPF/CNPJ</th>
+                  <th>Contato</th>
+                </tr>
+              </thead>
+              <tbody id="clientsTable"></tbody>
+            </table>
+          </div>
+          <div style="width:320px">
+            <h4>Adicionar cliente</h4>
+            <form id="addClientForm">
+              <input name="nome" placeholder="Nome" required />
+              <input name="doc" placeholder="CPF/CNPJ" />
+              <input name="contato" placeholder="Telefone / Email" />
+              <button class="btn" type="submit">Adicionar</button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" id="produtos" style="display:none">
+        <h3>Produtos</h3>
+        <div class="row">
+          <div class="col">
+            <table>
+              <thead>
+                <tr>
+                  <th>Produto</th>
+                  <th>Preço</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="productsTable"></tbody>
+            </table>
+          </div>
+          <div style="width:320px">
+            <h4>Adicionar produto</h4>
+            <form id="addProductForm">
+              <input name="nome" placeholder="Nome do produto" required />
+              <input name="preco" step="0.01" placeholder="Preço unitário R$" required />
+              <button class="btn" type="submit">Adicionar</button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" id="notas" style="display:none">
+        <h3>Notas Fiscais</h3>
+        <div class="row">
+          <div class="col">
+            <table>
+              <thead>
+                <tr>
+                  <th>NF</th>
+                  <th>Cliente</th>
+                  <th>Valor</th>
+                  <th>Status</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="nfTable"></tbody>
+            </table>
+          </div>
+          <div style="width:320px">
+            <h4>Gerar / Imprimir Nota</h4>
+            <div class="muted">Selecione uma venda que tenha 'Emitir nota' para gerar nota fiscal simulada</div>
+            <select id="nfSelect"></select>
+            <div style="display:flex;gap:8px;margin-top:8px">
+              <button class="btn" id="generateNF">Gerar Nota</button>
+              <button class="btn ghost" id="printNF">Imprimir Nota</button>
+            </div>
+            <div id="invoicePreview" style="display:none;margin-top:12px"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" id="relatorios" style="display:none">
+        <h3>Relatórios</h3>
+        <div class="muted">Exportar vendas por período ou ver resumo mensal</div>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <input type="date" id="rFrom" />
+          <input type="date" id="rTo" />
+          <button class="btn" id="exportSalesRange">Exportar</button>
+        </div>
+      </section>
+
+      <footer style="margin-top:12px" class="muted">Notas geradas são simuladas — integração real exige NF-e,
+        certificado A1/A3 e SEFAZ.</footer>
+    </main>
+  </div>
+
+  <script>
+    // storage
+    const KEY = 'vendas_picoles_v1'
+    const defaults = { products: [{ id: 'p1', nome: 'Picolé Morango', preco: 2.5 }, { id: 'p2', nome: 'Picolé Chocolate', preco: 2.0 }], clients: [], sales: [], nfs: [], lastNF: 1000 }
+    function load() { const r = localStorage.getItem(KEY); if (!r) { localStorage.setItem(KEY, JSON.stringify(defaults)); return structuredClone(defaults) } return JSON.parse(r) }
+    function save(s) { localStorage.setItem(KEY, JSON.stringify(s)) }
+    let state = load()
+
+    // ui helpers
+    const el = s => document.querySelector(s), els = s => document.querySelectorAll(s)
+    els('.nav button').forEach(b => b.addEventListener('click', () => { els('.nav button').forEach(x => x.classList.remove('active')); b.classList.add('active'); switchView(b.dataset.view) }))
+    function switchView(id) { els('section').forEach(s => s.style.display = 'none'); const sec = el('#' + id); if (sec) sec.style.display = 'block' }
+
+    function uid() { return Math.random().toString(36).slice(2, 9) }
+
+    // populate selects
+    function renderProducts() {
+      el('#productsTable').innerHTML = state.products.map(p => `<tr><td>${p.nome}</td><td>R$ ${p.preco.toFixed(2)}</td><td><button class='btn ghost' data-id='${p.id}' data-act='del'>Remover</button></td></tr>`).join('')
+      el('#saleProduto').innerHTML = state.products.map(p => `<option value='${p.id}'>${p.nome} — R$ ${p.preco.toFixed(2)}</option>`).join('')
+    }
+
+    function renderClients() { el('#clientsTable').innerHTML = state.clients.map(c => `<tr><td>${c.nome}</td><td>${c.doc || ''}</td><td>${c.contato || ''}</td></tr>`).join(''); el('#clientsCount').textContent = state.clients.length }
+
+    function renderSales() {
+      el('#salesTable').innerHTML = state.sales.slice().reverse().map(s => `<tr><td>${s.cliente}</td><td>${s.items.map(i => i.nome + ' x' + i.qt).join(', ')}</td><td>R$ ${s.total.toFixed(2)}</td></tr>`).join('')
+      el('#totalSales').textContent = 'R$ ' + state.sales.reduce((acc, s) => acc + s.total, 0).toFixed(2)
+    }
+
+    function renderNFTable() {
+      el('#nfTable').innerHTML = state.nfs.map(n => `<tr><td>${n.numero}</td><td>${n.cliente}</td><td>R$ ${n.total.toFixed(2)}</td><td>${n.status}</td><td><button class='btn ghost' data-id='${n.id}' data-act='view'>Ver</button></td></tr>`).join('')
+      el('#nfCount').textContent = state.nfs.length; el('#nfSelect').innerHTML = state.sales.filter(s => s.emitir === 'sim' && !s.nfId).map(s => `<option value='${s.id}'>Venda ${s.id} — ${s.cliente} — R$ ${s.total.toFixed(2)}</option>`).join('')
+    }
+
+    // add product
+    el('#addProductForm').addEventListener('submit', e => { e.preventDefault(); const data = Object.fromEntries(new FormData(e.target)); const p = { id: uid(), nome: data.nome, preco: parseFloat(data.preco) }; state.products.push(p); state.sales; save(state); e.target.reset(); renderProducts() })
+    el('#productsTable').addEventListener('click', e => { const btn = e.target.closest('button'); if (!btn) return; const id = btn.dataset.id; state.products = state.products.filter(p => p.id !== id); save(state); renderProducts() })
+
+    // add client
+    el('#addClientForm').addEventListener('submit', e => { e.preventDefault(); const d = Object.fromEntries(new FormData(e.target)); const c = { id: uid(), nome: d.nome, doc: d.doc, contato: d.contato }; state.clients.push(c); save(state); e.target.reset(); renderClients() })
+
+    // register sale
+    el('#saleForm').addEventListener('submit', e => { e.preventDefault(); const d = Object.fromEntries(new FormData(e.target)); const prod = state.products.find(p => p.id === d.produto); const qt = parseInt(d.qt, 10); const preco = parseFloat(d.preco); const total = qt * preco; const sale = { id: uid(), cliente: d.cliente, items: [{ id: prod.id, nome: prod.nome, qt, preco }], total, obs: d.obs, emitir: d.emitir, created: Date.now() }; state.sales.push(sale); state.log = state.log || []; state.log.unshift({ t: Date.now(), msg: 'Venda registrada: ' + sale.id }); save(state); e.target.reset(); renderSales(); renderNFTable(); alert('Venda registrada: ' + sale.id) })
+
+    // generate NF (simulada)
+    el('#generateNF').addEventListener('click', () => {
+      const saleId = el('#nfSelect').value; if (!saleId) { alert('Selecione uma venda elegível para nota'); return }
+      const sale = state.sales.find(s => s.id === saleId); if (!sale) { alert('Venda não encontrada'); return }
+      // increment nf number
+      state.lastNF = (state.lastNF || 1000) + 1
+      const nf = { id: uid(), numero: state.lastNF, cliente: sale.cliente, total: sale.total, items: sale.items, created: Date.now(), status: 'emitida', saleId: sale.id }
+      state.nfs.push(nf); // link
+      sale.nfId = nf.id
+      state.log.unshift({ t: Date.now(), msg: 'Nota gerada: ' + nf.numero })
+      save(state); renderNFTable(); renderSales(); renderInvoicePreview(nf)
+    })
+
+    // print invoice
+    el('#printNF').addEventListener('click', () => {
+      const preview = el('#invoicePreview'); if (preview.style.display === 'none') { alert('Gere a nota antes de imprimir'); return }
+      window.print()
+    })
+
+    // view nf
+    el('#nfTable').addEventListener('click', e => { const btn = e.target.closest('button'); if (!btn) return; const id = btn.dataset.id; const nf = state.nfs.find(n => n.id === id); if (nf) renderInvoicePreview(nf) })
+
+    function renderInvoicePreview(nf) {
+      const box = el('#invoicePreview'); box.style.display = 'block'; box.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center"><div><strong>Nota Fiscal (Simulada)</strong><div>NF Nº ${nf.numero}</div></div><div>${new Date(nf.created).toLocaleString()}</div></div>
+        <hr />
+        <div><strong>Cliente:</strong> ${nf.cliente}</div>
+        <div style="margin-top:8px"><strong>Itens</strong><table style='width:100%;border-collapse:collapse;margin-top:8px'><thead><tr><th style='text-align:left'>Produto</th><th>Qt</th><th>Preço</th><th>Total</th></tr></thead><tbody>${nf.items.map(i => `<tr><td>${i.nome}</td><td>${i.qt}</td><td>R$ ${i.preco.toFixed(2)}</td><td>R$ ${(i.qt * i.preco).toFixed(2)}</td></tr>`).join('')}</tbody></table></div>
+        <div style='margin-top:8px'><strong>Valor total:</strong> R$ ${nf.total.toFixed(2)}</div>
+        <div class='muted' style='margin-top:8px;font-size:12px'>Esta é uma nota fiscal simulada para fins de registro e impressão. Emissão real exige integração com SEFAZ.</div>
+      `
+    }
+
+    // search
+    el('#search').addEventListener('input', e => { const q = e.target.value.toLowerCase(); if (!q) { renderProducts(); renderClients(); renderSales(); renderNFTable(); return } const ps = state.products.filter(p => p.nome.toLowerCase().includes(q)); el('#productsTable').innerHTML = ps.map(p => `<tr><td>${p.nome}</td><td>R$ ${p.preco.toFixed(2)}</td><td>—</td></tr>`).join('') })
+
+    // export
+    el('#exportAll').addEventListener('click', () => { const a = document.createElement('a'); const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' }); a.href = URL.createObjectURL(blob); a.download = 'vendas_export.json'; a.click(); URL.revokeObjectURL(a.href) })
+
+    // reports export
+    el('#exportSalesRange').addEventListener('click', () => {
+      const from = new Date(el('#rFrom').value || 0).getTime(); const to = new Date(el('#rTo').value || Date.now()).getTime(); const results = state.sales.filter(s => s.created >= from && s.created <= to); const a = document.createElement('a'); const blob = new Blob([JSON.stringify(results, null, 2)], { type: 'application/json' }); a.href = URL.createObjectURL(blob); a.download = 'vendas_periodo.json'; a.click(); URL.revokeObjectURL(a.href)
+    })
+
+    // initial render
+    renderProducts(); renderClients(); renderSales(); renderNFTable(); switchView('vendas')
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,505 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dashboard Logística - Picolés</title>
+  <style>
+    :root{
+      --bg:#0b0b0b;
+      --card:#0f0f0f;
+      --accent:#d32f2f; /* red */
+      --muted:#9a9a9a;
+      --glass: rgba(255,255,255,0.03);
+      --success: #2ecc71;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial;color:#eee;background:linear-gradient(180deg,#060606 0%, #0e0e0e 100%)}
+
+    .app{display:grid;grid-template-columns:260px 1fr;gap:20px;min-height:100vh;padding:28px}
+    .sidebar{background:linear-gradient(180deg, rgba(211,47,47,0.06), rgba(0,0,0,0.3));border-radius:14px;padding:18px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 6px 20px rgba(0,0,0,0.6)}
+    .brand{display:flex;gap:12px;align-items:center;margin-bottom:12px}
+    .logo{width:48px;height:48px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#700000);display:flex;align-items:center;justify-content:center;font-weight:700}
+    .brand h1{font-size:16px;margin:0}
+    .nav{margin-top:8px}
+    .nav button{display:block;width:100%;text-align:left;padding:10px;border-radius:8px;background:transparent;border:none;color:var(--muted);margin-bottom:6px;cursor:pointer}
+    .nav button.active, .nav button:hover{background:linear-gradient(90deg,rgba(211,47,47,0.12), rgba(0,0,0,0.2));color:#fff}
+
+    .search{display:flex;gap:8px;margin:12px 0}
+    .search input{flex:1;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:#fff}
+
+    .main{padding:18px;border-radius:14px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.03);box-shadow:0 8px 30px rgba(0,0,0,0.6)}
+    .header{display:flex;justify-content:space-between;align-items:center}
+    .stats{display:flex;gap:12px;margin:18px 0}
+    .card{background:var(--card);padding:14px;border-radius:12px;flex:1;border:1px solid rgba(255,255,255,0.03)}
+    .card h3{margin:0 0 8px 0;font-size:13px;color:var(--muted)}
+    .big{font-size:24px;font-weight:700}
+
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    .full{grid-column:1/-1}
+
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:8px;text-align:left;border-bottom:1px dashed rgba(255,255,255,0.03);font-size:13px}
+    th{color:var(--muted);font-weight:600}
+
+    .btn{display:inline-flex;gap:8px;align-items:center;padding:8px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:linear-gradient(90deg,var(--accent),#8b0000);color:#fff;cursor:pointer}
+    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06)}
+
+    form{display:flex;flex-direction:column;gap:8px}
+    input,select{padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:#fff}
+
+    /* small screens */
+    @media (max-width:900px){.app{grid-template-columns:1fr;padding:12px}.grid{grid-template-columns:1fr}.sidebar{order:2}.main{order:1}}
+
+    /* little badges */
+    .badge{padding:4px 8px;border-radius:999px;font-size:12px;background:rgba(255,255,255,0.04);color:var(--muted)}
+
+    /* temperature indicator */
+    .temp{display:flex;gap:8px;align-items:center}
+    .thermo{width:10px;height:40px;border-radius:6px;background:linear-gradient(180deg,var(--accent),#ff7b7b);position:relative}
+    .thermo span{position:absolute;left:14px;font-size:13px}
+
+    .row{display:flex;gap:12px}
+    .col{flex:1}
+
+    .muted{color:var(--muted)}
+
+    footer{margin-top:18px;text-align:center;color:var(--muted);font-size:13px}
+
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="logo">P</div>
+        <div>
+          <h1>Logística Picolés</h1>
+          <div class="muted" style="font-size:12px">Painel operacional</div>
+        </div>
+      </div>
+
+      <div class="search">
+        <input id="globalSearch" placeholder="Pesquisar... (produto, rota, veículo)" />
+        <button class="btn ghost" id="addQuick">+Novo</button>
+      </div>
+
+      <nav class="nav">
+        <button class="active" data-view="dashboard">Dashboard</button>
+        <button data-view="estoque">Estoque</button>
+        <button data-view="pedidos">Pedidos</button>
+        <button data-view="veiculos">Veículos</button>
+        <button data-view="rotas">Rotas</button>
+        <button data-view="fornecedores">Fornecedores</button>
+        <button data-view="planejamento">Planejamento</button>
+      </nav>
+
+      <div style="margin-top:18px">
+        <div class="muted" style="font-size:12px">Modo</div>
+        <div style="margin-top:6px">
+          <span class="badge">Temperatura ideal: -18°C</span>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="header">
+        <div>
+          <h2 style="margin:0">Dashboard operacional</h2>
+          <div class="muted">Visão geral das funcionalidades de logística para picolés</div>
+        </div>
+        <div class="row">
+          <div style="margin-right:12px" class="muted">Usuário: Operações</div>
+          <button class="btn" id="exportBtn">Exportar JSON</button>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="card">
+          <h3>Produtos em estoque</h3>
+          <div class="big" id="stockCount">0</div>
+          <div class="muted">Itens prontos para envio</div>
+        </div>
+        <div class="card">
+          <h3>Pedidos ativos</h3>
+          <div class="big" id="ordersCount">0</div>
+          <div class="muted">Expedições a realizar</div>
+        </div>
+        <div class="card">
+          <h3>Veículos ativos</h3>
+          <div class="big" id="vehiclesCount">0</div>
+          <div class="muted">Câmaras e temperatura</div>
+        </div>
+      </div>
+
+      <div class="grid">
+        <section class="card" id="dashboard">
+          <h3>Resumo rápido</h3>
+          <div style="display:flex;gap:12px;flex-wrap:wrap">
+            <div style="min-width:220px">
+              <h4 style="margin:6px 0">Controle de qualidade (temperatura)</h4>
+              <div id="tempList"></div>
+            </div>
+            <div style="min-width:220px">
+              <h4 style="margin:6px 0">Últimos movimentos</h4>
+              <div id="activityLog" class="muted" style="font-size:13px;max-height:160px;overflow:auto"></div>
+            </div>
+            <div style="min-width:220px">
+              <h4 style="margin:6px 0">Rota sugerida</h4>
+              <div id="suggestedRoute" class="muted">—</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="card" id="estoque" style="display:none">
+          <h3>Estoque & Inventário</h3>
+          <div class="row">
+            <div class="col">
+              <table>
+                <thead><tr><th>Produto</th><th>Qtd</th><th>Validade</th><th>Ações</th></tr></thead>
+                <tbody id="stockTable"></tbody>
+              </table>
+            </div>
+            <div style="width:320px">
+              <h4>Adicionar produto</h4>
+              <form id="addProductForm">
+                <input name="name" placeholder="Nome do produto (ex: Picolé Morango)" required />
+                <input name="qty" type="number" placeholder="Quantidade" value="100" required />
+                <input name="expiry" type="date" required />
+                <button class="btn" type="submit">Adicionar</button>
+              </form>
+            </div>
+          </div>
+        </section>
+
+        <section class="card" id="pedidos" style="display:none">
+          <h3>Pedidos / Expedição</h3>
+          <div class="row">
+            <div class="col">
+              <table>
+                <thead><tr><th>Cliente</th><th>Itens</th><th>Status</th><th>Ações</th></tr></thead>
+                <tbody id="ordersTable"></tbody>
+              </table>
+            </div>
+            <div style="width:320px">
+              <h4>Criar pedido</h4>
+              <form id="createOrderForm">
+                <input name="cliente" placeholder="Nome do cliente" required />
+                <select name="produto" id="orderProduto"></select>
+                <input name="qt" type="number" value="20" required />
+                <input name="address" placeholder="Endereço / ponto de entrega" required />
+                <button class="btn" type="submit">Gerar Pedido</button>
+              </form>
+            </div>
+          </div>
+        </section>
+
+        <section class="card" id="veiculos" style="display:none">
+          <h3>Veículos & Monitoramento</h3>
+          <div class="row">
+            <div class="col">
+              <table>
+                <thead><tr><th>ID</th><th>Placa</th><th>Temp (°C)</th><th>Status</th><th>Ações</th></tr></thead>
+                <tbody id="vehiclesTable"></tbody>
+              </table>
+            </div>
+            <div style="width:320px">
+              <h4>Adicionar veículo</h4>
+              <form id="addVehicleForm">
+                <input name="placa" placeholder="Placa" required />
+                <input name="capacity" type="number" placeholder="Capacidade (qtd)" value="1000" required />
+                <input name="temp" type="number" step="0.1" placeholder="Temperatura atual" value="-18" required />
+                <button class="btn" type="submit">Adicionar veículo</button>
+              </form>
+            </div>
+          </div>
+        </section>
+
+        <section class="card" id="rotas" style="display:none">
+          <h3>Rotas & Distribuição</h3>
+          <div class="row">
+            <div class="col">
+              <h4>Pontos de entrega</h4>
+              <table>
+                <thead><tr><th>Pedido</th><th>Endereço</th><th>Cliente</th><th>Ações</th></tr></thead>
+                <tbody id="routeTable"></tbody>
+              </table>
+              <div style="margin-top:8px"><button class="btn" id="planRoute">Planejar rota ótima</button></div>
+            </div>
+            <div style="width:320px">
+              <h4>Simular entrega</h4>
+              <div class="muted">Escolha veículo e execute simulação</div>
+              <select id="simVehicle"></select>
+              <button class="btn" id="runSim">Iniciar simulação</button>
+              <div style="margin-top:12px" id="simLog" class="muted"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="card" id="fornecedores" style="display:none">
+          <h3>Fornecedores & Insumos</h3>
+          <div class="row">
+            <div class="col">
+              <table>
+                <thead><tr><th>Fornecedor</th><th>Item</th><th>Entrega (dias)</th><th>Ações</th></tr></thead>
+                <tbody id="suppliersTable"></tbody>
+              </table>
+            </div>
+            <div style="width:320px">
+              <h4>Adicionar fornecedor</h4>
+              <form id="addSupplierForm">
+                <input name="name" placeholder="Nome do fornecedor" required />
+                <input name="item" placeholder="Insumo (ex: embalagens)" required />
+                <input name="lead" type="number" placeholder="Lead time (dias)" value="3" required />
+                <button class="btn" type="submit">Adicionar</button>
+              </form>
+            </div>
+          </div>
+        </section>
+
+        <section class="card full" id="planejamento" style="display:none">
+          <h3>Planejamento & Custos</h3>
+          <div class="row">
+            <div class="col">
+              <h4>Simulação de custo de transporte</h4>
+              <form id="costForm" class="row">
+                <input name="dist" type="number" placeholder="Distância (km)" />
+                <input name="fuel" type="number" placeholder="Preço combustível R$/L" />
+                <input name="consumo" type="number" placeholder="Consumo km/L" />
+                <button class="btn" id="calcCost">Calcular</button>
+              </form>
+              <div id="costResult" class="muted" style="margin-top:8px"></div>
+            </div>
+            <div style="width:320px">
+              <h4>Indicadores</h4>
+              <div class="muted">Tempo médio de entrega: <span id="avgDelivery">—</span></div>
+              <div class="muted">Perdas / mês estimadas: <span id="losses">—</span></div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+      <footer>Feito para treinar operações — tema vermelho & preto • Sem backend (dados no LocalStorage)</footer>
+    </main>
+  </div>
+
+  <script>
+    /* ======= Simulação de Sistema (single-file SPA) =======
+       - Todos os dados são guardados no localStorage para persistência local
+       - Funcionalidades: estoque, pedidos, veículos, rotas, fornecedores, planejamento
+    */
+
+    // ---- helpers ----
+    const uid = ()=>Math.random().toString(36).slice(2,9)
+    const el=(s)=>document.querySelector(s)
+    const els=(s)=>document.querySelectorAll(s)
+    const todayISO = ()=>new Date().toISOString().split('T')[0]
+
+    // ---- data layer (localStorage) ----
+    const STORE_KEY = 'logistica_picoles_v1'
+    const defaults = {
+      products:[
+        {id:'p1',name:'Picolé Morango',qty:400,expiry:todayISO()},
+        {id:'p2',name:'Picolé Chocolate',qty:300,expiry:todayISO()},
+      ],
+      orders:[],
+      vehicles:[{id:'v1',placa:'ABC-1A23',capacity:1000,temp:-18,status:'pronto'}],
+      suppliers:[{id:'s1',name:'Embalagens SA',item:'Caixas',lead:3}],
+      log:[]
+    }
+
+    function load(){
+      const raw = localStorage.getItem(STORE_KEY)
+      if(!raw){ localStorage.setItem(STORE_KEY, JSON.stringify(defaults)); return structuredClone(defaults) }
+      return JSON.parse(raw)
+    }
+    function save(state){ localStorage.setItem(STORE_KEY, JSON.stringify(state)) }
+
+    let state = load()
+
+    // ---- UI init ----
+    const views = els('.nav button')
+    views.forEach(b=>b.addEventListener('click', ()=>{els('.nav button').forEach(x=>x.classList.remove('active'));b.classList.add('active');switchView(b.dataset.view)}))
+    function switchView(v){ els('section').forEach(s=>s.style.display='none'); const sel = el('#'+v); if(sel) sel.style.display='block'; }
+
+    // quick add
+    el('#addQuick').addEventListener('click', ()=>{
+      // add a quick product sample
+      const p = {id:uid(),name:'Picolé Limão (fast)',qty:50,expiry:todayISO()}
+      state.products.push(p); state.log.unshift({t:Date.now(),msg:'Adicionado produto rápido: '+p.name}); save(state); refreshAll()
+    })
+
+    // ---- Stock ----
+    function renderStock(){
+      el('#stockTable').innerHTML = state.products.map(p=>`
+        <tr>
+          <td>${p.name}</td>
+          <td>${p.qty}</td>
+          <td>${p.expiry}</td>
+          <td><button class='btn ghost' data-id='${p.id}' data-act='edit'>Editar</button> <button class='btn ghost' data-id='${p.id}' data-act='del'>Remover</button></td>
+        </tr>
+      `).join('')
+      el('#stockCount').textContent = state.products.reduce((s,a)=>s+a.qty,0)
+    }
+
+    el('#addProductForm').addEventListener('submit', e=>{
+      e.preventDefault(); const f = e.target; const data = Object.fromEntries(new FormData(f)); const p={id:uid(),name:data.name,qty:parseInt(data.qty||0,10),expiry:data.expiry}
+      state.products.push(p); state.log.unshift({t:Date.now(),msg:'Produto adicionado: '+p.name}); save(state); f.reset(); refreshAll()
+    })
+
+    el('#stockTable').addEventListener('click', (ev)=>{
+      const btn = ev.target.closest('button'); if(!btn) return; const id=btn.dataset.id; const act=btn.dataset.act
+      if(act==='del'){ state.products = state.products.filter(p=>p.id!==id); state.log.unshift({t:Date.now(),msg:'Produto removido: '+id}); save(state); refreshAll() }
+      if(act==='edit'){ const p = state.products.find(x=>x.id===id); const n = prompt('Novo nome',p.name); if(n){p.name=n; save(state); refreshAll()} }
+    })
+
+    // ---- Orders ----
+    function renderOrders(){
+      el('#ordersTable').innerHTML = state.orders.map(o=>`
+        <tr>
+          <td>${o.cliente}</td>
+          <td>${o.items.map(i=>i.name+ ' x'+i.qty).join(', ')}</td>
+          <td>${o.status}</td>
+          <td>
+            ${o.status==='pendente'?`<button class='btn ghost' data-id='${o.id}' data-act='dispatch'>Despachar</button>`:''}
+            <button class='btn ghost' data-id='${o.id}' data-act='delorder'>Remover</button>
+          </td>
+        </tr>
+      `).join('')
+      el('#ordersCount').textContent = state.orders.length
+
+      // route table
+      el('#routeTable').innerHTML = state.orders.map(o=>`<tr><td>${o.id}</td><td>${o.address}</td><td>${o.cliente}</td><td><button class='btn ghost' data-id='${o.id}' data-act='routeview'>Ver</button></td></tr>`).join('')
+    }
+
+    // populate product select for orders
+    function populateProductSelect(){
+      const sel = el('#orderProduto'); sel.innerHTML = state.products.map(p=>`<option value='${p.id}'>${p.name} (qtd disponível: ${p.qty})</option>`).join('')
+    }
+
+    el('#createOrderForm').addEventListener('submit', e=>{
+      e.preventDefault(); const f= e.target; const data = Object.fromEntries(new FormData(f)); const prod = state.products.find(p=>p.id===data.produto)
+      const qty = parseInt(data.qt,10)
+      if(!prod || prod.qty < qty){ alert('Quantidade indisponível no estoque'); return }
+      prod.qty -= qty
+      const order = {id:uid(),cliente:data.cliente,items:[{id:prod.id,name:prod.name,qty}],address:data.address,status:'pendente',created:Date.now()}
+      state.orders.push(order); state.log.unshift({t:Date.now(),msg:'Pedido criado: '+order.id}); save(state); f.reset(); refreshAll()
+    })
+
+    el('#ordersTable').addEventListener('click', ev=>{
+      const btn = ev.target.closest('button'); if(!btn) return; const id = btn.dataset.id; const act = btn.dataset.act
+      if(act==='dispatch'){ const o = state.orders.find(x=>x.id===id); if(o){ o.status='em_transito'; state.log.unshift({t:Date.now(),msg:'Pedido despachado: '+id}); save(state); refreshAll() }}
+      if(act==='delorder'){ state.orders = state.orders.filter(x=>x.id!==id); state.log.unshift({t:Date.now(),msg:'Pedido removido: '+id}); save(state); refreshAll() }
+    })
+
+    // ---- Vehicles ----
+    function renderVehicles(){
+      el('#vehiclesTable').innerHTML = state.vehicles.map(v=>`
+        <tr>
+          <td>${v.id}</td>
+          <td>${v.placa}</td>
+          <td>${v.temp.toFixed(1)}°C</td>
+          <td>${v.temp > -14 ? '<span style="color:#ffb3b3">ALERTA</span>' : 'OK'}</td>
+          <td><button class='btn ghost' data-id='${v.id}' data-act='temp'>Ajustar temp</button> <button class='btn ghost' data-id='${v.id}' data-act='delv'>Remover</button></td>
+        </tr>
+      `).join('')
+      el('#vehiclesCount').textContent = state.vehicles.length
+
+      el('#simVehicle').innerHTML = state.vehicles.map(v=>`<option value='${v.id}'>${v.placa} / ${v.id}</option>`).join('')
+    }
+
+    el('#addVehicleForm').addEventListener('submit', e=>{
+      e.preventDefault(); const data=Object.fromEntries(new FormData(e.target)); const v={id:uid(),placa:data.placa,capacity:parseInt(data.capacity,10),temp:parseFloat(data.temp),status:'pronto'}
+      state.vehicles.push(v); state.log.unshift({t:Date.now(),msg:'Veículo adicionado: '+v.placa}); save(state); e.target.reset(); refreshAll()
+    })
+
+    el('#vehiclesTable').addEventListener('click', ev=>{
+      const btn = ev.target.closest('button'); if(!btn) return; const id = btn.dataset.id; const act = btn.dataset.act
+      const v = state.vehicles.find(x=>x.id===id)
+      if(act==='temp'){ const t = prompt('Nova temperatura (°C)', v.temp); if(t!==null){ v.temp = parseFloat(t); state.log.unshift({t:Date.now(),msg:'Temperatura alterada: '+v.placa+' -> '+v.temp}); save(state); refreshAll() }}
+      if(act==='delv'){ state.vehicles = state.vehicles.filter(x=>x.id!==id); state.log.unshift({t:Date.now(),msg:'Veículo removido: '+id}); save(state); refreshAll() }
+    })
+
+    // ---- Suppliers ----
+    function renderSuppliers(){
+      el('#suppliersTable').innerHTML = state.suppliers.map(s=>`<tr><td>${s.name}</td><td>${s.item}</td><td>${s.lead} dias</td><td><button class='btn ghost' data-id='${s.id}' data-act='del'>Remover</button></td></tr>`).join('')
+    }
+    el('#addSupplierForm').addEventListener('submit', e=>{ e.preventDefault(); const data=Object.fromEntries(new FormData(e.target)); const s={id:uid(),name:data.name,item:data.item,lead:parseInt(data.lead,10)}; state.suppliers.push(s); state.log.unshift({t:Date.now(),msg:'Fornecedor adicionado: '+s.name}); save(state); e.target.reset(); refreshAll() })
+    el('#suppliersTable').addEventListener('click', ev=>{ const btn=ev.target.closest('button'); if(!btn) return; const id=btn.dataset.id; state.suppliers = state.suppliers.filter(s=>s.id!==id); state.log.unshift({t:Date.now(),msg:'Fornecedor removido: '+id}); save(state); refreshAll() })
+
+    // ---- Routing (simple nearest-neighbor) ----
+    function planRoute(){
+      // naive plan: order by created time (FIFO) but mark as route
+      const points = state.orders.filter(o=>o.status==='pendente')
+      if(points.length===0) return 'Nenhum pedido pendente'
+      // for demo: sort by cliente name
+      const route = points.slice().sort((a,b)=>a.cliente.localeCompare(b.cliente))
+      state.log.unshift({t:Date.now(),msg:'Rota planejada com '+route.length+' pontos'});
+      save(state)
+      return route.map(r=>r.cliente+ ' — '+r.address).join('\n')
+    }
+    el('#planRoute').addEventListener('click', ()=>{ el('#suggestedRoute').textContent = planRoute(); refreshAll() })
+
+    // ---- Simulation of delivery ----
+    el('#runSim').addEventListener('click', ()=>{
+      const vid = el('#simVehicle').value; const v = state.vehicles.find(x=>x.id===vid); const pending = state.orders.filter(o=>o.status==='pendente')
+      if(!v){ alert('Selecione um veículo') ; return }
+      if(pending.length===0){ alert('Nenhum pedido pendente') ; return }
+      el('#simLog').textContent = 'Simulação iniciada...';
+      // simulate deliveries sequentially
+      const logLines = []
+      let temp = v.temp
+      pending.forEach((o,i)=>{
+        // small temp drift
+        temp += (Math.random()-0.5)*1.2
+        // check temp
+        const ok = temp <= -14
+        o.status = ok ? 'entregue' : 'problema'
+        logLines.push(`Entrega ${i+1}: ${o.cliente} — ${ok? 'OK':'PROBLEMA (temp '+temp.toFixed(1)+'°C)'}`)
+      })
+      v.temp = temp
+      state.log.unshift({t:Date.now(),msg:'Simulação finalizada para veículo '+v.placa})
+      save(state); renderSimLog(logLines.join('\n'));
+      refreshAll()
+    })
+    function renderSimLog(txt){ el('#simLog').textContent = txt }
+
+    // ---- Planning / Cost ----
+    el('#calcCost').addEventListener('click', e=>{ e.preventDefault(); const f= e.target.closest('form')||e.target; const data = Object.fromEntries(new FormData(f)); const dist = parseFloat(data.dist||0); const price = parseFloat(data.fuel||0); const cons = parseFloat(data.consumo||1); if(!dist||!price||!cons){ el('#costResult').textContent = 'Preencha distância, preço e consumo.'; return } const liters = dist/cons; const cost = liters*price; el('#costResult').textContent = `Custo estimado: R$ ${cost.toFixed(2)} (litros: ${liters.toFixed(2)})`; }
+    )
+
+    // ---- Activity log / temp list ----
+    function renderLog(){ el('#activityLog').innerHTML = state.log.slice(0,30).map(l=>`<div>${new Date(l.t).toLocaleString()} — ${l.msg}</div>`).join('') }
+    function renderTemps(){ el('#tempList').innerHTML = state.vehicles.map(v=>`<div class='temp'><div class='thermo' style='height:36px'></div><div><strong>${v.placa}</strong><div class='muted'>${v.temp.toFixed(1)}°C</div></div></div>`).join('') }
+
+    // ---- Export JSON ----
+    el('#exportBtn').addEventListener('click', ()=>{
+      const a = document.createElement('a'); const blob = new Blob([JSON.stringify(state,null,2)],{type:'application/json'}); a.href = URL.createObjectURL(blob); a.download = 'logistica_pedidos.json'; a.click(); URL.revokeObjectURL(a.href)
+    })
+
+    // ---- global search ----
+    el('#globalSearch').addEventListener('input', e=>{ const q=e.target.value.toLowerCase(); if(!q){ refreshAll(); return } // filter by name in products, orders, vehicles
+      const p = state.products.filter(x=>x.name.toLowerCase().includes(q))
+      el('#stockTable').innerHTML = p.map(pp=>`<tr><td>${pp.name}</td><td>${pp.qty}</td><td>${pp.expiry}</td><td>—</td></tr>`).join('')
+    })
+
+    // ---- misc UI events ----
+    el('#routeTable').addEventListener('click', ev=>{ const btn = ev.target.closest('button'); if(!btn) return; const id = btn.dataset.id; const o = state.orders.find(x=>x.id===id); if(o) alert('Pedido '+id+'\nCliente: '+o.cliente+'\nEndereço: '+o.address) })
+
+    // ---- refresh all ----
+    function refreshAll(){ renderStock(); renderOrders(); renderVehicles(); renderSuppliers(); renderLog(); renderTemps(); populateProductSelect(); updateIndicators() }
+    function updateIndicators(){ // simple calculations
+      const delivered = state.orders.filter(o=>o.status==='entregue').length
+      const totalOrders = state.orders.length
+      const avg = totalOrders? Math.round((delivered/totalOrders)*100)+'%':'—'
+      el('#avgDelivery').textContent = avg
+      el('#losses').textContent = Math.max(0, Math.round(state.products.reduce((s,a)=>s + (a.qty<50?5:0),0))) + ' unidades (estimado)'
+    }
+
+    // initial render
+    refreshAll(); switchView('dashboard')
+
+  </script>
+</body>
+</html>

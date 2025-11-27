@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta-name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro - Eskimo</title>
+
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: "Poppins", sans-serif;
+        background: radial-gradient(circle at top right, #ffecec, #ffffff);
+        background-attachment: fixed;
+    }
+
+    /* Container */
+    section {
+        max-width: 480px;
+        margin: 80px auto;
+        background: #fff;
+        padding: 50px;
+        border-radius: 28px;
+        box-shadow: 0 6px 20px #00000025;
+        position: relative;
+        overflow: hidden;
+        animation: fadeIn 0.6s ease-out;
+        transition: 0.2s ease;
+    }
+
+    section:hover {
+        transform: translateY(-3px);
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Bolhas decorativas estilo Eskimo */
+    section::before,
+    section::after {
+        content: "";
+        position: absolute;
+        background: #ffd5d5;
+        width: 130px;
+        height: 130px;
+        border-radius: 50%;
+        z-index: -1;
+        opacity: 0.8;
+    }
+
+    section::before {
+        top: -40px;
+        right: -30px;
+    }
+
+    section::after {
+        bottom: -40px;
+        left: -30px;
+    }
+
+    /* Logo */
+    .logo {
+        width: 150px;
+        display: block;
+        margin: 0 auto 15px;
+    }
+
+    /* Título */
+    h2 {
+        color: #0A0A23;
+        font-size: 1.9rem;
+        font-weight: 800;
+        text-align: center;
+        margin: 10px 0;
+    }
+
+    /* Subtexto */
+    .sub {
+        text-align: center;
+        font-size: 0.92rem;
+        color: #555;
+        margin-bottom: 25px;
+    }
+
+    /* Labels */
+    label {
+        display: block;
+        text-align: left;
+        font-weight: 600;
+        margin-top: 18px;
+        color: #333;
+        font-size: .95rem;
+    }
+
+    /* Inputs */
+    input, select {
+        width: 100%;
+        padding: 14px;
+        border-radius: 12px;
+        border: 2px solid #e0e0e0;
+        font-size: 1rem;
+        background: #fafafa;
+        transition: .25s ease;
+    }
+
+    input:focus, select:focus {
+        border-color: #ff3b3f;
+        box-shadow: 0 0 8px #ffb1b3;
+        background: white;
+    }
+
+    /* Botão */
+    button {
+        margin-top: 28px;
+        width: 100%;
+        padding: 14px;
+        background: #ff3b3f;
+        color: white;
+        font-size: 1.2rem;
+        font-weight: 700;
+        border: none;
+        border-radius: 14px;
+        cursor: pointer;
+        transition: 0.25s;
+        box-shadow: 0 4px 12px #ff3b3f55;
+        letter-spacing: .5px;
+    }
+
+    button:hover {
+        background: #e22f32;
+        transform: translateY(-3px);
+    }
+
+    /* Botão voltar */
+    .voltar {
+        display: inline-block;
+        margin-bottom: 20px;
+        color: #0A0A23;
+        font-weight: 600;
+        text-decoration: none;
+        font-size: 0.9rem;
+        transition: 0.2s ease;
+    }
+
+    .voltar:hover {
+        color: #ff3b3f;
+    }
+
+    /* Rodapé pequeno */
+    .footer {
+        text-align: center;
+        font-size: 0.85rem;
+        color: #777;
+        margin-top: 15px;
+    }
+
+    .footer a {
+        color: #ff3b3f;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+</style>
+</head>
+
+<body>
+
+<section>
+
+    <a href="index.html" class="voltar">← Voltar ao site</a>
+
+    <img class="logo" src="/image-1.png.webp">
+
+    <h2>Crie sua conta</h2>
+    <p class="sub">Crie sua conta para acessar uma área exclusiva.</p>
+
+    <form action="cadastro.php" method="post">
+        
+        <label for="nome">Nome completo:</label>
+        <input type="text" name="nome" placeholder="Seu nome completo" required>
+
+        <label for="email">E-mail:</label>
+        <input type="email" name="email" placeholder="E-mail que você mais acessa " required>
+
+        <label for="senha">senha:</label>
+        <input type="password"  name="senha" required placeholder="sua senha tem que ter 6 digitos e pelo menos um número" id="">
+                
+        <label for="cargo">Selecione seu perfil:</label>
+        <select name="colaborador" required>
+            <option value="" disabled selected hidden>Escolha uma opção</option>
+            <option value="venda">Vendedor</option>
+            <option value="logistica">Logística</option>
+            <option value="usuario_producao">Cliente</option>
+        </select>
+
+        <button type="submit">Entrar</button>
+    </form>
+
+    <p class="footer">Não tem conta? <a href="criar_conta.html">Fazer cadastro</a></p>
+
+</section>
+
+</body>
+</html>
