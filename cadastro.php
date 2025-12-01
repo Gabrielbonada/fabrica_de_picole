@@ -19,6 +19,21 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $email = $_POST['email'] ?? '';
     $senha = $_POST['senha'] ?? '';
     $tipodecolaborador = $_POST['colaborador'] ?? '';
+    $tipodecolaborador = strtolower($tipodecolaborador); 
+    $tipodecolaborador = str_replace('á', 'a', $tipodecolaborador);
+$tipodecolaborador = str_replace('é', 'e', $tipodecolaborador);
+$tipodecolaborador = str_replace('í', 'i', $tipodecolaborador);
+$tipodecolaborador = str_replace('ó', 'o', $tipodecolaborador);
+$tipodecolaborador = str_replace('ú', 'u', $tipodecolaborador);
+$tipodecolaborador = str_replace('ã', 'a', $tipodecolaborador);
+$tipodecolaborador = str_replace('õ', 'o', $tipodecolaborador);
+$tipodecolaborador = str_replace('ç', 'c', $tipodecolaborador);
+$tipodecolaborador = str_replace('â', 'a', $tipodecolaborador);
+$tipodecolaborador = str_replace('ê', 'e', $tipodecolaborador);
+$tipodecolaborador = str_replace('ô', 'o', $tipodecolaborador);
+// Para o seu caso, se for apenas 'Usuário', o principal é:
+$tipodecolaborador = str_replace('uário', 'uario', $tipodecolaborador); // Simplificação
+$tipodecolaborador = str_replace('á', 'a', $tipodecolaborador); // Se for 'Usuário'
 
     // criptografa a senha
     $senhaHash = password_hash($senha, PASSWORD_DEFAULT);

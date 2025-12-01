@@ -25,6 +25,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     // 2. AJUSTAR A CONSULTA SQL para buscar a senha E o tipo de colaborador
     $stmt = $conn->prepare("SELECT senha, tipodecolaborador FROM cadastros WHERE email = ?");
+    echo "estou aqui";
+
     
     $stmt->bind_param("s", $email);
     $stmt->execute();
@@ -48,9 +50,29 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $_SESSION['usuario_email'] = $email;
                 $_SESSION['usuario_perfil'] = $perfilDoBanco;
 
-                // Redireciona para a página principal
-                if($perfilDoBanco == $tipodecolaboradorescolhido){
-                    header("location: indexvendedor.html");
+                // Lógica de redirecionamento condicional
+                $pagina_redirecionamento = "";
+
+                // Assumindo que os valores de $perfilDoBanco são 'vendedor', 'logista' e 'usuario'
+                switch ($perfilDoBanco) {
+                    case 'vendedor':
+                        $pagina_redirecionamento = "indexvendedor.html";
+                        break;
+                    case 'logista':
+                        $pagina_redirecionamento = "indexlogista.html";
+                        break;
+                    case 'usuario':
+                        $pagina_redirecionamento = "indexusuario.html";
+                        break;
+                    default:
+                        //caso de erro, pagina padrão
+                        $pagina_redirecionamento = "index_padrao.html";
+                        break;
+                }
+
+                // Redireciona para a página correta
+                if (!empty($pagina_redirecionamento)) {
+                    header("location: " . $pagina_redirecionamento);
                     exit();
                 }
 
